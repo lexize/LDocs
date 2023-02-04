@@ -1,0 +1,14 @@
+{
+  "version": "${mod_version}",
+  "id": "ldocs",
+  "schemaVersion": 1,
+  "name": "LDocs",
+  "description": "Mod providing documentation screen for mods and resource packs",
+  "depends": {
+    "minecraft": "${minecraft_version}",
+    "fabricloader": ">=${fabric_loader_version}"
+  },
+  "mixins": [
+    "ldocs.mixins.json"
+  ]
+}
