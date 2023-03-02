@@ -6,6 +6,7 @@ import org.lexize.ldocs.gui.components.LDocsTreeElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class LDocsElement {
     private Component elementTitle;
@@ -14,7 +15,7 @@ public class LDocsElement {
      * Should docs element be expanded in docs screen by default.
      */
     public boolean expandedByDefault = false;
-    private LDocsPage elementPage;
+    private Supplier<LDocsPage> elementPage;
     public LDocsTreeElement buildTree(int x, int y, int width) {
         LDocsTreeElement element = new LDocsTreeElement(x,y,width, this);
         List<LDocsTreeElement> children = new ArrayList<>();
@@ -39,10 +40,10 @@ public class LDocsElement {
     }
 
     public LDocsPage getElementPage() {
-        return elementPage;
+        return elementPage.get();
     }
 
-    public void setElementPage(LDocsPage elementPage) {
+    public void setElementPage(Supplier<LDocsPage> elementPage) {
         this.elementPage = elementPage;
     }
 }

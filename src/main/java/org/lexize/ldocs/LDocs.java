@@ -35,7 +35,7 @@ public class LDocs {
                     kv.getValue()) {
                 LDocsElement ce = new LDocsElement();
                 ce.setElementTitle(Component.literal(FiguraDocsManager.getNameFor(cd.thisClass)));
-                ce.setElementPage(new LDocsClassPage(0,0,1,1,cd));
+                ce.setElementPage(() -> new LDocsClassPage(0,0,1,1,cd));
                 e.getChildren().add(ce);
                 classElement.getChildren().add(ce);
             }

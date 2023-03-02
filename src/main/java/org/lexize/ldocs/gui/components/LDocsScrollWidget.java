@@ -23,13 +23,21 @@ public class LDocsScrollWidget extends AbstractContainerWidget {
     }
 
     public void setContainedWidget(AbstractWidget containedWidget) {
+        boolean added = false;
         if (children.size() < 1) {
-            if (containedWidget != null) children.add(containedWidget);
+            if (containedWidget != null) {
+                children.add(containedWidget);
+                added = true;
+            }
         }
         else {
             if (containedWidget == null) children.remove(0);
-            else children.set(0, containedWidget);
+            else {
+                children.set(0, containedWidget);
+                added = true;
+            }
         }
+        if (added) containedWidget.setWidth(width);
     }
 
     public double getScroll() {
@@ -70,7 +78,10 @@ public class LDocsScrollWidget extends AbstractContainerWidget {
     public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
         while (children.size() > 1) children.remove(1);
         var widget = getContainedWidget();
-        if (widget != null) widget.setY(getY()-((int)scroll));
+        if (widget != null) {
+            widget.setX(getX());
+            widget.setY(getY()-((int)scroll));
+        }
         super.renderButton(matrices, mouseX, mouseY, delta);
     }
 
@@ -99,5 +110,12 @@ public class LDocsScrollWidget extends AbstractContainerWidget {
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
-
+    @Override
+    public void setWidth(int value) {
+        super.setWidth(value);
+        var widget = getContainedWidget();
+        if (widget != null) {
+            widget.setWidth(value);
+        }
+    }
 }
