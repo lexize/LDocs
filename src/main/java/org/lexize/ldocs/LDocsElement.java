@@ -1,22 +1,20 @@
 package org.lexize.ldocs;
 
-import com.mojang.blaze3d.vertex.*;
 import net.minecraft.network.chat.Component;
-import org.joml.Matrix4f;
-import org.lexize.ldocs.gui.LDocsPage;
-import org.lexize.ldocs.gui.LDocsTreeElement;
+import org.lexize.ldocs.gui.pages.LDocsPage;
+import org.lexize.ldocs.gui.components.LDocsTreeElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class LDocsElement {
+public class LDocsElement {
     private Component elementTitle;
     private List<LDocsElement> children = new ArrayList<>();
-    private LDocsPage elementPage;
     /**
      * Should docs element be expanded in docs screen by default.
      */
     public boolean expandedByDefault = false;
+    private LDocsPage elementPage;
     public LDocsTreeElement buildTree(int x, int y, int width) {
         LDocsTreeElement element = new LDocsTreeElement(x,y,width, this);
         List<LDocsTreeElement> children = new ArrayList<>();
@@ -24,8 +22,12 @@ public abstract class LDocsElement {
                 this.children) {
             children.add(e.buildTree(0,0,width));
         }
-        element.setChildren(children);
+        element.getChildren().addAll(children);
         return element;
+    }
+
+    public void setElementTitle(Component elementTitle) {
+        this.elementTitle = elementTitle;
     }
 
     public Component getElementTitle() {
@@ -38,5 +40,9 @@ public abstract class LDocsElement {
 
     public LDocsPage getElementPage() {
         return elementPage;
+    }
+
+    public void setElementPage(LDocsPage elementPage) {
+        this.elementPage = elementPage;
     }
 }

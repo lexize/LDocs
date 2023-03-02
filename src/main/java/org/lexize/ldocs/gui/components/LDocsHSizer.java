@@ -1,4 +1,4 @@
-package org.lexize.ldocs.gui;
+package org.lexize.ldocs.gui.components;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
+import org.lexize.ldocs.gui.LDocsYResizableWidget;
 
 import java.awt.*;
 import java.util.ArrayList;

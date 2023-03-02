@@ -25,6 +25,7 @@ dependencies {
         mappings("org.quiltmc:quilt-mappings:$minecraft_version+build.$mappings_version:intermediary-v2")
         officialMojangMappings()
     }
+    modImplementation (include("com.github.Kingdom-of-The-Moon:FiguraRewriteRewrite:${figura_build_version}"))
     modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
     modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
 }

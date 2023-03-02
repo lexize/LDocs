@@ -3,7 +3,7 @@
   "id": "ldocs",
   "schemaVersion": 1,
   "name": "LDocs",
-  "description": "Mod providing documentation screen for mods and resource packs",
+  "description": "Mod providing documentation screen for Figura",
   "depends": {
     "minecraft": "${minecraft_version}",
     "fabricloader": ">=${fabric_loader_version}"

@@ -31,6 +31,7 @@ public class LDocsDrawHelper {
         float y2 = Math.max(y, y+height);
         var matrix = matrices.last().pose();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.enableBlend();
         BufferBuilder bb = Tesselator.getInstance().getBuilder();
         bb.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         bb.vertex(matrix, x1, y2, 0.0F).color(r,g,b,a).endVertex();
@@ -38,6 +39,7 @@ public class LDocsDrawHelper {
         bb.vertex(matrix, x2, y1, 0.0F).color(r,g,b,a).endVertex();
         bb.vertex(matrix, x1, y1, 0.0F).color(r,g,b,a).endVertex();
         BufferUploader.drawWithShader(bb.end());
+        RenderSystem.disableBlend();
     }
     public static void fillImage(PoseStack matrices, float x, float y, float width, float height, float u1, float v1, float u2, float v2, int rgba) {
         float a = (rgba & 0xFF) / 255f;
@@ -53,6 +55,7 @@ public class LDocsDrawHelper {
         float y2 = Math.max(y, y+height);
         var matrix = matrices.last().pose();
         RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+        RenderSystem.enableBlend();
         BufferBuilder bb = Tesselator.getInstance().getBuilder();
         bb.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
         bb.vertex(matrix, x1, y2, 0.0F).color(r,g,b,a).uv(u1,v2).endVertex();
@@ -60,6 +63,7 @@ public class LDocsDrawHelper {
         bb.vertex(matrix, x2, y1, 0.0F).color(r,g,b,a).uv(u2,v1).endVertex();
         bb.vertex(matrix, x1, y1, 0.0F).color(r,g,b,a).uv(u1,v1).endVertex();
         BufferUploader.drawWithShader(bb.end());
+        RenderSystem.disableBlend();
     }
     public static void fillRotated(PoseStack matrices, float x, float y, float width, float height, float angle, int rgba) {
         float a = (rgba & 0xFF) / 255f;
@@ -82,12 +86,12 @@ public class LDocsDrawHelper {
         float b = (rgba >> 8 & 0xFF) / 255f;
         fillImageRotated(matrices, x, y, width, height, angle, u1, v1, u2, v2, r,g,b,a);
     }
-
     public static void fillImageRotated(PoseStack matrices, float x, float y, float width, float height, float angle, float u1, float v1, float u2, float v2, float r, float g, float b, float a) {
         matrices.pushPose();
-        matrices.mulPoseMatrix(new Matrix4f().rotate(angle,0,0,1).setTranslation(width/2,height/2,0));
-        matrices.translate(x,y,0);
-        fillImage(matrices, -(width/2), -(height/2), width, height, u1, v1, u2, v2, r,g,b,a);
+        matrices.translate(x+width/2, y+height/2, 0);
+        matrices.mulPoseMatrix(new Matrix4f().rotate(angle,0,0,1));
+        matrices.translate(-(width/2),-(height/2),0);
+        fillImage(matrices, 0, 0, width, height, u1, v1, u2, v2, r,g,b,a);
         matrices.popPose();
     }
     public static void drawText(PoseStack poseStack, Component text, float x, float y, float z, float size, int color) {
@@ -106,5 +110,9 @@ public class LDocsDrawHelper {
     }
     public static List<FormattedCharSequence> wrapText(Component text, int maxWidth, float textSize) {
         return getClient().font.split(text, (int)(maxWidth/textSize));
+    }
+
+    public static FormattedText substrByWidth(FormattedText text, int maxWidth, float textSize) {
+        return getClient().font.substrByWidth(text, (int)(maxWidth / textSize));
     }
 }

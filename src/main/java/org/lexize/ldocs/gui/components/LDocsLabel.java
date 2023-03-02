@@ -1,4 +1,4 @@
-package org.lexize.ldocs.gui;
+package org.lexize.ldocs.gui.components;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
