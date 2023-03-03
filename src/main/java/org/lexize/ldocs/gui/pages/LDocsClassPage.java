@@ -13,6 +13,7 @@ import org.lexize.ldocs.gui.components.LDocsWrappedLabel;
 import org.lexize.ldocs.utils.LDocsClickEvent;
 import org.moon.figura.lua.docs.FiguraDoc;
 import org.moon.figura.lua.docs.FiguraDocsManager;
+import org.moon.figura.utils.ColorUtils;
 import org.moon.figura.utils.FiguraText;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class LDocsClassPage extends LDocsPage {
     private LDocsLabel functionsLabel;
     private LDocsLabel fieldsLabel;
     private final LDocsWrappedLabel descriptionLabel;
+    private static final Style ACCENT_STYLE = ColorUtils.Colors.FRAN_PINK.style;
     public LDocsClassPage(int x, int y, int width, int height,FiguraDoc.ClassDoc doc) {
         super(x, y, width, height, Component.literal(FiguraDocsManager.getNameFor(doc.thisClass)));
         int yOffset;
@@ -40,7 +42,7 @@ public class LDocsClassPage extends LDocsPage {
         Class<?> superClass = doc.superclass;
         if (superClass != null) {
             extendsSuperclassLabel = new LDocsLabel(5, yOffset, FiguraText.of("docs.text.extends").append(" ")
-                    .append(getClassText(superClass).withStyle(ChatFormatting.YELLOW)));
+                    .append(getClassText(superClass).withStyle(ACCENT_STYLE)));
             yOffset += extendsSuperclassLabel.getHeight();
             widgets.add(extendsSuperclassLabel);
         }
@@ -146,7 +148,7 @@ public class LDocsClassPage extends LDocsPage {
             super(x, y, width, 0, Component.empty());
             int yOffset;
             MutableComponent fieldDescriptorComponent = Component.empty();
-            fieldDescriptorComponent.append(getClassText(f.type).withStyle(ChatFormatting.YELLOW));
+            fieldDescriptorComponent.append(getClassText(f.type).withStyle(ACCENT_STYLE));
             fieldDescriptorComponent.append(" " + f.name);
             fieldDescriptor = new LDocsWrappedLabel(x,y, width,fieldDescriptorComponent);
             widgets.add(fieldDescriptor);
@@ -200,7 +202,7 @@ public class LDocsClassPage extends LDocsPage {
         public MethodBox(int x, int y, int width, FiguraDoc.MethodDoc m) {
             super(x,y,width,0, Component.empty());
             int yOffset;
-            titleLable = new LDocsLabel(x,y,Component.literal(m.name).withStyle(ChatFormatting.YELLOW));
+            titleLable = new LDocsLabel(x,y,Component.literal(m.name).withStyle(ACCENT_STYLE));
             widgets.add(titleLable);
             yOffset = titleLable.getY() + titleLable.getHeight() + 1;
             for (int i = 0; i < m.parameterNames.length; i++) {
@@ -210,13 +212,13 @@ public class LDocsClassPage extends LDocsPage {
                 MutableComponent c = Component.literal(m.name);
                 c.append("(");
                 for (int j = 0; j < argsNames.length; j++) {
-                    c.append(getClassText(argsTypes[j]).withStyle(ChatFormatting.YELLOW));
+                    c.append(getClassText(argsTypes[j]).withStyle(ACCENT_STYLE));
                     c.append(" " + argsNames[j]);
                     if (j < argsNames.length - 1) c.append(", ");
                 }
                 c.append(") ");
                 c.append(FiguraText.of("docs.text.returns")).append(" ").append(
-                        getClassText(returnType).withStyle(ChatFormatting.YELLOW)
+                        getClassText(returnType).withStyle(ACCENT_STYLE)
                 );
                 LDocsWrappedLabel overloadLabel = new LDocsWrappedLabel(x+5, yOffset, width-5, c);
                 overloadStrings.add(overloadLabel);

@@ -10,6 +10,7 @@ import net.minecraft.util.FormattedCharSequence;
 import org.lexize.ldocs.LDocs;
 import org.lexize.ldocs.LDocsElement;
 import org.lexize.ldocs.utils.LDocsDrawHelper;
+import org.moon.figura.utils.ColorUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -24,10 +25,16 @@ public class LDocsTreeElement extends AbstractContainerWidget {
     private static final ResourceLocation EXPANDER_ICON = new ResourceLocation("ldocs", "textures/gui/expander_icon.png");
     private static final Color TREE_ELEMENT_COLOR = new Color(1f,1f,1f,0.1f);
     private static final Color TREE_ELEMENT_HOVER_COLOR = new Color(1f,1f,1f,0.25f);
-    private static final Color TREE_ELEMENT_SELECTED_COLOR = new Color(0.75f,0.45f,1f,0.1f);
-    private static final Color TREE_ELEMENT_SELECTED_HOVER_COLOR = new Color(0.75f,0.45f,1f,0.25f);
+    private static final Color TREE_ELEMENT_SELECTED_COLOR;
+    private static final Color TREE_ELEMENT_SELECTED_HOVER_COLOR;
     private static final Color TREE_ELEMENT_EXPANDER_COLOR = Color.white;
-    private static final Color TREE_ELEMENT_EXPANDER_HOVER_COLOR = new Color(0.75f,0.25f,1f);
+    private static final Color TREE_ELEMENT_EXPANDER_HOVER_COLOR;
+    static {
+        var selectedCol = ColorUtils.Colors.MAYA_BLUE.vec.asVec3f();
+        TREE_ELEMENT_SELECTED_COLOR = new Color(selectedCol.x,selectedCol.y,selectedCol.z,0.1f);
+        TREE_ELEMENT_SELECTED_HOVER_COLOR = new Color(selectedCol.x,selectedCol.y,selectedCol.z,0.25f);
+        TREE_ELEMENT_EXPANDER_HOVER_COLOR = new Color(selectedCol.x,selectedCol.y,selectedCol.z,1f);
+    }
     private float expandedProgress = 0;
     private final LDocsElement sourceElement;
     private final List<LDocsTreeElement> children = new ArrayList<>();
@@ -83,7 +90,9 @@ public class LDocsTreeElement extends AbstractContainerWidget {
         int heightSum = 0;
         for (var element :
                 children) {
-            heightSum += element.getHeight() + CHILDREN_ELEMENT_Y_PADDING;
+            if (element.visible) {
+                heightSum += element.getHeight() + CHILDREN_ELEMENT_Y_PADDING;
+            }
         }
         return elementHeight + heightSum;
     }
@@ -125,10 +134,12 @@ public class LDocsTreeElement extends AbstractContainerWidget {
             int yOffset = getActualHeight() + CHILDREN_ELEMENT_Y_PADDING;
             for (var element :
                     children) {
-                element.setX(getX() + xOffset);
-                element.setY(getY()+yOffset);
-                element.setWidth(getWidth()-CHILDREN_ELEMENT_X_PADDING);
-                yOffset += element.getHeight() + CHILDREN_ELEMENT_Y_PADDING;
+                if (element.visible) {
+                    element.setX(getX() + xOffset);
+                    element.setY(getY()+yOffset);
+                    element.setWidth(getWidth()-CHILDREN_ELEMENT_X_PADDING);
+                    yOffset += element.getHeight() + CHILDREN_ELEMENT_Y_PADDING;
+                }
             }
         }
         for (int i = 0; i < elementTitle.size(); i++) {
@@ -147,6 +158,31 @@ public class LDocsTreeElement extends AbstractContainerWidget {
             }
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        for(var e: children) {
+            if (e.active && e.visible && e.mouseClicked(mouseX, mouseY, button)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
+        for (var e :
+                children) {
+            if (e.visible) {
+                e.render(matrices, mouseX, mouseY, delta);
+            }
+        }
+    }
+
+    public LDocsElement getSourceElement() {
+        return sourceElement;
+    }
+
+    public boolean isExpanded() {
+        return expanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded && canBeExpanded();
     }
 }

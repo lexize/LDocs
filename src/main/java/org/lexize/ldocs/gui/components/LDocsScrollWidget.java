@@ -4,8 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import org.moon.figura.gui.widgets.ScrollBarWidget;
+import org.moon.figura.utils.ui.UIHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class LDocsScrollWidget extends AbstractContainerWidget {
     protected List<? extends AbstractWidget> getContainedChildren() {
         return children;
     }
-    private int sizeDiff() {
+    public int maxScroll() {
         if (getContainedWidget() == null) return 0;
         return Math.max(0, getContainedWidget().getHeight() - height);
     }
@@ -67,7 +68,7 @@ public class LDocsScrollWidget extends AbstractContainerWidget {
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         if (super.mouseScrolled(mouseX, mouseY, amount)) return true;
         else if (isMouseOver(mouseX, mouseY)) {
-            int sz = sizeDiff();
+            int sz = maxScroll();
             scroll = Math.min(sz, Math.max(0, scroll - (amount*5)));
             return true;
         }
@@ -82,7 +83,9 @@ public class LDocsScrollWidget extends AbstractContainerWidget {
             widget.setX(getX());
             widget.setY(getY()-((int)scroll));
         }
+        UIHelper.setupScissor(getX(),getY(),getWidth(),getHeight());
         super.renderButton(matrices, mouseX, mouseY, delta);
+        UIHelper.disableScissor();
     }
 
     @Override
@@ -97,16 +100,19 @@ public class LDocsScrollWidget extends AbstractContainerWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!isMouseOver(mouseX,mouseY)) return false;
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (!isMouseOver(mouseX,mouseY)) return false;
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (!isMouseOver(mouseX,mouseY)) return false;
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
@@ -117,5 +123,9 @@ public class LDocsScrollWidget extends AbstractContainerWidget {
         if (widget != null) {
             widget.setWidth(value);
         }
+    }
+
+    public interface OnPress {
+        void onPress(LDocsScrollWidget scrollbar);
     }
 }

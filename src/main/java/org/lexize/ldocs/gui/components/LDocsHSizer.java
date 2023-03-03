@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 import org.lexize.ldocs.gui.LDocsYResizableWidget;
+import org.moon.figura.utils.ui.UIHelper;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -110,8 +111,8 @@ public class LDocsHSizer extends AbstractContainerWidget implements LDocsYResiza
             leftWidget.setWidth(lWidth);
         }
         if (rightWidget != null) {
-            int rXPos = (int)((widgetWidth * sizerProgress) + sizerPadding + (sizerWidth /2));
-            rightWidget.setX(rXPos);
+            int rXPos = getRightXRelativePos();
+            rightWidget.setX(getX()+rXPos);
             rightWidget.setY(getY());
             rightWidget.setWidth(widgetWidth - rXPos);
         }
@@ -120,7 +121,7 @@ public class LDocsHSizer extends AbstractContainerWidget implements LDocsYResiza
     private boolean mouseInSizer(double mouseX, double mouseY) {
         int widgetWidth = getWidth();
         float sizerPos = (widgetWidth * sizerProgress);
-        float xPos = sizerPos - (sizerWidth / 2f);
+        float xPos = getX()+(sizerPos - (sizerWidth / 2f));
         return (mouseX >= xPos && mouseX <= xPos + sizerWidth) && (mouseY >= getY() && mouseY <= getY()+getHeight());
     }
 
@@ -135,18 +136,29 @@ public class LDocsHSizer extends AbstractContainerWidget implements LDocsYResiza
         //width = getClient().getWindow().getScreenWidth();
         //height = getClient().getWindow().getScreenWidth();
         Color barColor = mouseInSizer(mouseX, mouseY) ? SIZER_HOVERED_COLOR : SIZER_COLOR;
-        int barX = (int)((getWidth() * sizerProgress) - (sizerWidth / 2f));
+        int barX = getX()+(int)((getWidth() * sizerProgress) - (sizerWidth / 2f));
         RenderSystem.setShaderColor(barColor.getRed() / 255f, barColor.getGreen() / 255f,
                 barColor.getBlue() / 255f, barColor.getAlpha() / 255f);
         RenderSystem.enableBlend();
         fill(matrices, barX, getY(), barX+sizerWidth,getY()+getHeight(), 0xFFFFFFFF);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1,1,1,1);
+        UIHelper.setupScissor(getX(),getY(),getWidth(),getHeight());
         super.render(matrices, mouseX, mouseY, delta);
+        UIHelper.disableScissor();
     }
-
+    public int getRightXRelativePos() {
+        return (int)((getWidth() * sizerProgress) + sizerPadding + (sizerWidth /2));
+    }
+    public int getRightWidth() {
+        return width - getRightXRelativePos();
+    }
+    public int getLeftWidth() {
+        return (int)((width * sizerProgress) - sizerPadding - (sizerWidth /2));
+    }
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!isMouseOver(mouseX,mouseY)) return false;
         if (button == 0) {
             if (mouseInSizer(mouseX, mouseY)) {
                 changingSizerPos = true;
@@ -158,6 +170,7 @@ public class LDocsHSizer extends AbstractContainerWidget implements LDocsYResiza
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (!isMouseOver(mouseX,mouseY)) return false;
         if (button == 0) {
             if (changingSizerPos) {
                 changingSizerPos = false;
@@ -169,6 +182,7 @@ public class LDocsHSizer extends AbstractContainerWidget implements LDocsYResiza
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (!isMouseOver(mouseX,mouseY)) return false;
         if (changingSizerPos) {
             sizerProgress = Math.max(Math.min((float) ((mouseX - getX()) / getWidth()), maxSizerProgress), minSizerProgress);
             update();
