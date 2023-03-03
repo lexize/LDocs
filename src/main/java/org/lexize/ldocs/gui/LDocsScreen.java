@@ -10,11 +10,13 @@ import org.lexize.ldocs.gui.components.LDocsHSizer;
 import org.lexize.ldocs.gui.components.LDocsScrollWidget;
 import org.lexize.ldocs.gui.components.LDocsTreeElement;
 import org.lexize.ldocs.gui.pages.LDocsPage;
+import org.moon.figura.gui.screens.AbstractPanelScreen;
 
-public class LDocsScreen extends Screen {
+public class LDocsScreen extends AbstractPanelScreen {
     private final LDocsTreeElement rootTreeElement;
-    public LDocsScreen() {
-        super(Component.translatable("ldocs.docs_screen"));
+    public static final Component TITLE = Component.translatable("ldocs.docs_screen");;
+    public LDocsScreen(Screen parent) {
+        super(parent, TITLE, LDocsScreen.class);
         LDocsElement docsRootElement = new LDocsElement();
         docsRootElement.setElementTitle(Component.translatable("ldocs.tree.root"));
         for (LDocsElement e :
@@ -26,7 +28,14 @@ public class LDocsScreen extends Screen {
     }
     private LDocsHSizer sizer;
     private LDocsPage selectedPage = null;
+    private LDocsElement selectedElement = null;
     private LDocsScrollWidget pageScrollElement;
+
+    @Override
+    public Component getTitle() {
+        return TITLE;
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -49,10 +58,11 @@ public class LDocsScreen extends Screen {
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         LDocsElement element = LDocs.getSelectedElement();
-        LDocsPage currentPage = element != null ? element.getElementPage() : null;
-        if (currentPage != selectedPage) {
-            selectedPage = currentPage;
+        if (element != selectedElement) {
+            selectedElement = element;
+            selectedPage = element.getElementPage();
             pageScrollElement.setContainedWidget(selectedPage);
+            pageScrollElement.setScroll(0);
         }
         super.renderBackground(matrices);
         super.render(matrices, mouseX, mouseY, delta);

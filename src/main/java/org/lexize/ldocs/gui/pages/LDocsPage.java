@@ -15,11 +15,8 @@ public abstract class LDocsPage extends AbstractContainerWidget {
     public LDocsPage(int x, int y, int width, int height, Component component) {
         super(x, y, width, height, component);
     }
-    public abstract void resize(int width);
-
     @Override
     public void setWidth(int value) {
         super.setWidth(value);
-        resize(value);
     }
 }

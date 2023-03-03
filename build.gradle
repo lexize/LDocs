@@ -43,10 +43,6 @@ processResources {
     }
 }
 
-jar {
-    rename { "${archives_base_name}_${mod_version}" }
-}
-
 test {
     useJUnitPlatform()
 }

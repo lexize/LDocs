@@ -1,5 +1,8 @@
 {
   "ldocs.tree.root": "Figura docs",
   "ldocs.tree.globals": "Globals",
-  "ldocs.tree.classes": "Classes"
+  "ldocs.tree.classes": "Classes",
+  "ldocs.pages.class.functions": "Functions",
+  "ldocs.pages.class.fields": "Fields"
+
 }

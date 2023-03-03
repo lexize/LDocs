@@ -40,7 +40,7 @@ public class LDocsElement {
     }
 
     public LDocsPage getElementPage() {
-        return elementPage.get();
+        return elementPage != null ? elementPage.get() : null;
     }
 
     public void setElementPage(Supplier<LDocsPage> elementPage) {

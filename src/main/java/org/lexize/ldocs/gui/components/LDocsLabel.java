@@ -6,6 +6,8 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import org.lexize.ldocs.utils.LDocsClickEvent;
 import org.lexize.ldocs.utils.LDocsDrawHelper;
 
 public class LDocsLabel extends AbstractWidget {
@@ -43,5 +45,30 @@ public class LDocsLabel extends AbstractWidget {
 
     public void setTextSize(float textSize) {
         this.textSize = textSize;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        var client = getClient();
+        var splitter = client.font.getSplitter();
+        var lines = splitter.splitLines(getMessage(), Integer.MAX_VALUE, Style.EMPTY);
+        int x = (int) Math.floor((mouseX - getX()) / textSize);
+        int y = (int) Math.floor((mouseY - getY()) / textSize);
+        if (x >= 0 && y >= 0 && y / 9 < lines.size()) {
+            var line = lines.get(y/9);
+            var style = splitter.componentStyleAtWidth(line, x);
+            if (style != null) {
+                var clickEvent = style.getClickEvent();
+                if (clickEvent instanceof LDocsClickEvent ldce) {
+                    ldce.onClickHandler.run();
+                    return true;
+                }
+                else if (client.screen != null) {
+                    client.screen.handleComponentClicked(style);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

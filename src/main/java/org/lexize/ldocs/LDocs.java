@@ -20,6 +20,8 @@ public class LDocs {
     private static final Logger LDOCS_LOGGER = Logger.getLogger("LDocs");
     private static final List<LDocsElement> loadedElements = new ArrayList<>();
     private static LDocsElement selectedElement;
+    public static HashMap<Class<?>, LDocsElement> classesToElements = new HashMap<>();
+    public static HashMap<LDocsElement,SwitchToElementRunnable> elementsToRunnables = new HashMap<>();
     public static void init() {
         var classesDocs = getFiguraDocs();
         LDocsElement globalsElement = new LDocsElement();
@@ -34,8 +36,10 @@ public class LDocs {
             for (FiguraDoc.ClassDoc cd :
                     kv.getValue()) {
                 LDocsElement ce = new LDocsElement();
+                elementsToRunnables.put(ce, new SwitchToElementRunnable(ce));
                 ce.setElementTitle(Component.literal(FiguraDocsManager.getNameFor(cd.thisClass)));
                 ce.setElementPage(() -> new LDocsClassPage(0,0,1,1,cd));
+                classesToElements.put(cd.thisClass, ce);
                 e.getChildren().add(ce);
                 classElement.getChildren().add(ce);
             }
@@ -56,7 +60,9 @@ public class LDocs {
     public static void setSelectedElement(LDocsElement selectedElement) {
         LDocs.selectedElement = selectedElement;
     }
-
+    public static LDocsElement getDocsElementByClass(Class<?> c) {
+        return classesToElements.get(c);
+    }
     public static List<LDocsElement> getLoadedElements() {
         return loadedElements;
     }
@@ -105,6 +111,16 @@ public class LDocs {
                 component.append(appendableComponent);
                 return Optional.of(component);
             }
+        }
+    }
+    public static class SwitchToElementRunnable implements Runnable {
+        private final LDocsElement element;
+        public SwitchToElementRunnable(LDocsElement element) {
+            this.element = element;
+        }
+        @Override
+        public void run() {
+            setSelectedElement(element);
         }
     }
 }

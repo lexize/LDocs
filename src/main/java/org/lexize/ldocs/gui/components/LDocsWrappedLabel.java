@@ -4,7 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
+import org.lexize.ldocs.utils.LDocsClickEvent;
 import org.lexize.ldocs.utils.LDocsDrawHelper;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import java.util.List;
 public class LDocsWrappedLabel extends LDocsLabel {
     private List<FormattedCharSequence> renderableSequence = new ArrayList<>();
     int width;
-    private boolean shouldUpdate = false;
+    private boolean shouldUpdate;
     public LDocsWrappedLabel(int x, int y, int width, Component message) {
         super(x, y, message);
         setWidth(width);
@@ -39,23 +41,27 @@ public class LDocsWrappedLabel extends LDocsLabel {
 
     @Override
     public void setWidth(int value) {
-        width = value;
-        shouldUpdate = true;
+        if (width != value) {
+            width = value;
+            shouldUpdate = true;
+        }
     }
 
     @Override
     public void setTextSize(float textSize) {
-        super.setTextSize(textSize);
-        shouldUpdate = true;
+        if (textSize != getTextSize()) {
+            super.setTextSize(textSize);
+            shouldUpdate = true;
+        }
     }
 
     @Override
     public int getHeight() {
         var font = getClient().font;
-        return (int) (font.split(getMessage(), font.width(getMessage())).size() * font.lineHeight * getTextSize());
+        return (int) (renderableSequence.size() * font.lineHeight * getTextSize());
     }
 
-    private void updateRenderableSequence() {
+    public void update() {
         renderableSequence.clear();
         renderableSequence.addAll(LDocsDrawHelper.wrapText(getMessage(), getWidth(), getTextSize()));
         shouldUpdate = false;
@@ -63,10 +69,35 @@ public class LDocsWrappedLabel extends LDocsLabel {
 
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        if (shouldUpdate) updateRenderableSequence();
+        if (shouldUpdate) update();
         float y = 0;
         for (Iterator<FormattedCharSequence> sequenceIterator = renderableSequence.iterator(); sequenceIterator.hasNext(); y += (getClient().font.lineHeight * getTextSize())) {
             LDocsDrawHelper.drawText(matrices, sequenceIterator.next(), getX(), getY()+y,0,getTextSize(), 0xFFFFFF);
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        var client = getClient();
+        var splitter = client.font.getSplitter();
+        var lines = renderableSequence;
+        int x = (int) Math.floor((mouseX - getX()) / getTextSize());
+        int y = (int) Math.floor((mouseY - getY()) / getTextSize());
+        if (x >= 0 && y >= 0 && y / 9 < lines.size()) {
+            var line = lines.get(y/9);
+            var style = splitter.componentStyleAtWidth(line, x);
+            if (style != null) {
+                var clickEvent = style.getClickEvent();
+                if (clickEvent instanceof LDocsClickEvent ldce) {
+                    ldce.onClickHandler.run();
+                    return true;
+                }
+                else if (client.screen != null) {
+                    client.screen.handleComponentClicked(style);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

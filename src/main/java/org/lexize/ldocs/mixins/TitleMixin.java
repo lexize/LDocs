@@ -25,11 +25,13 @@ public abstract class TitleMixin extends Screen {
     @Inject(method = "init", at = @At("RETURN"))
     private void onInit(CallbackInfo ci) {
 
-        var button = new ImageButton(0,0,20,20,0,0, 20, BUTTON_TEXTURE, 64,64, TitleMixin::onPress);
+        var button = new ImageButton(0,0,20,20,0,0, 20, BUTTON_TEXTURE, 64,64, (b) -> {
+            onPress(b);
+        });
         this.addRenderableWidget(button);
     }
 
-    private static void onPress(Button btn) {
-        Minecraft.getInstance().setScreen(new LDocsScreen());
+    private void onPress(Button btn) {
+        Minecraft.getInstance().setScreen(new LDocsScreen(this));
     }
 }
